@@ -9,6 +9,7 @@ from os.path import exists as file_exists
 from lxml import etree
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
+from tabulate import tabulate
 
 def read_rss_feeds(rss_feeds_path):
     """
@@ -152,6 +153,17 @@ def generate_frequency(tokens, limit=10):
     fdist = FreqDist(tokens)
     return fdist.most_common(limit)
 
+def tabulate_frequency(frequency):
+    """
+    Tabulates the frequency distribution
+    :param frequency:
+    :return:
+    """
+    tabulate_data = []
+    for word, freq in frequency:
+        tabulate_data.append([word, freq])
+    return tabulate(tabulate_data, headers=['Word', 'Frequency'])
+
 def main():
     corpus_path = 'data/corpus.txt'
     if not file_exists(corpus_path):
@@ -177,15 +189,17 @@ def main():
     print(f'Generated {len(tokens)} tokens')
 
     filtered_tokens =  filter_stopwords(tokens)
-    print(f'Filtered {len(filtered_tokens)} tokens')
+    print(f'Filtering {len(filtered_tokens)} tokens for stopwords')
 
     filtered_tokens = filter_regex_patterns(filtered_tokens)
-    print(f'Filtered {len(filtered_tokens)} tokens')
+    print(f'Filtering {len(filtered_tokens)} tokens with regular expressions')
     # print(filtered_tokens)
 
     # Perform a frequency distribution
     frequency = generate_frequency(filtered_tokens, limit=100)
-    print(frequency)
+
+    tabulatation = tabulate_frequency(frequency)
+    print(tabulatation)
 
 if __name__ == '__main__':
     main()
